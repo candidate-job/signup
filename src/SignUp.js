@@ -13,6 +13,9 @@ import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { FormGroup } from "@mui/material";
 import HowToRegIcon from "@mui/icons-material/HowToReg";
+import S3 from "aws-sdk/clients/s3";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function Copyright(props) {
   return (
@@ -35,29 +38,79 @@ function Copyright(props) {
 const theme = createTheme();
 
 export default function SignUp() {
-  const handleSubmit = (event) => {
+  const [checkedItems, setCheckedItems] = React.useState({});
+
+  const handleChange = (event) => {
+    setCheckedItems({
+      ...checkedItems,
+      [event.target.name]: event.target.checked,
+    });
+  };
+
+  const S3_BUCKET = process.env.REACT_APP_BUCKET_NAME;
+  const REGION = process.env.REACT_APP_REGION_NAME;
+  const ACCESS_KEY = process.env.REACT_APP_ACCESS_KEY;
+  const SECRET_ACCESS_KEY = process.env.REACT_APP_SECRET_KEY;
+
+  const s3 = new S3({
+    accessKeyId: ACCESS_KEY,
+    secretAccessKey: SECRET_ACCESS_KEY,
+    region: REGION,
+    signatureVersion: "v4",
+  });
+
+  const handleUpload = async (userProfileObj) => {
+    try {
+      toast("Saving your profile...");
+      const res = s3.putObject(
+        {
+          Bucket: S3_BUCKET,
+          Key: `${userProfileObj.firstName}-${userProfileObj.lastName}.json`,
+          Body: JSON.stringify(userProfileObj),
+          ContentType: "application/octet-stream",
+        },
+        function (err, data) {
+          console.log(JSON.stringify(err) + " " + JSON.stringify(data));
+        }
+      );
+      console.log(res);
+    } catch (e) {
+      toast.error("Upload Failed");
+      console.log(e);
+    }
+  };
+
+  const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get("email"),
-      password: data.get("password"),
+    console.log(data);
+    console.log(checkedItems);
+    const userProfileObj = {
       firstName: data.get("firstName"),
       lastName: data.get("lastName"),
+      email: data.get("email"),
+      password: data.get("password"),
       previousTitle: data.get("prevTitle"),
       previousCompany: data.get("prevCompany"),
       currentLocation: data.get("currentLocation"),
-      currentTitle: data.get("currentTitle"),
+      remote: checkedItems.remote || false,
+      hybrid: checkedItems.hybrid || false,
+      inPerson: checkedItems.inPerson || false,
       linkedIn: data.get("linkedIn"),
       github: data.get("github"),
       idealNextRole: data.get("idealNextRole"),
       yeasOfExperience: data.get("yearsOfExperience"),
       otherNotes: data.get("otherNotes"),
-    });
+      visaSponsorship: checkedItems.visaSponsorship || false,
+      recruitersContact: checkedItems.recruitersContact || false,
+    };
+    handleUpload(userProfileObj);
   };
 
   return (
     <ThemeProvider theme={theme}>
       <Container component="main" maxWidth="xs">
+        <ToastContainer />
         <CssBaseline />
         <Box
           sx={{
@@ -100,6 +153,16 @@ export default function SignUp() {
                 <TextField
                   required
                   fullWidth
+                  id="email"
+                  label="Email Address"
+                  name="email"
+                  autoComplete="email"
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  required
+                  fullWidth
                   id="prevTitle"
                   label="Previous Title"
                   name="prevTitle"
@@ -118,7 +181,6 @@ export default function SignUp() {
               </Grid>
               <Grid item xs={12}>
                 <TextField
-                  required
                   fullWidth
                   id="currentLocation"
                   label="Current Location"
@@ -126,7 +188,6 @@ export default function SignUp() {
                   autoComplete="current-location"
                 />
               </Grid>
-
               <Grid container paddingLeft="16px">
                 <Grid item xs={12} textAlign="left">
                   <Typography component="h6" variant="h6">
@@ -135,18 +196,45 @@ export default function SignUp() {
                 </Grid>
                 <Grid item xs={4}>
                   <FormGroup>
-                    <FormControlLabel control={<Checkbox />} label="Remote" />
-                  </FormGroup>
-                </Grid>
-                <Grid item xs={4}>
-                  <FormGroup>
-                    <FormControlLabel control={<Checkbox />} label="Hybrid" />
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          id="remote"
+                          name="remote"
+                          checked={checkedItems["remote"] || false}
+                          onChange={handleChange}
+                        />
+                      }
+                      label="Remote"
+                    />
                   </FormGroup>
                 </Grid>
                 <Grid item xs={4}>
                   <FormGroup>
                     <FormControlLabel
-                      control={<Checkbox />}
+                      control={
+                        <Checkbox
+                          id="hybrid"
+                          name="hybrid"
+                          checked={checkedItems["hybrid"] || false}
+                          onChange={handleChange}
+                        />
+                      }
+                      label="Hybrid"
+                    />
+                  </FormGroup>
+                </Grid>
+                <Grid item xs={4}>
+                  <FormGroup>
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          id="inPerson"
+                          name="inPerson"
+                          checked={checkedItems["inPerson"] || false}
+                          onChange={handleChange}
+                        />
+                      }
                       label="In-person"
                     />
                   </FormGroup>
@@ -164,7 +252,6 @@ export default function SignUp() {
               </Grid>
               <Grid item xs={12}>
                 <TextField
-                  required
                   fullWidth
                   id="github"
                   label="Github"
@@ -172,23 +259,12 @@ export default function SignUp() {
                   autoComplete="github"
                 />
               </Grid>
+
               <Grid item xs={12}>
                 <TextField
-                  required
-                  fullWidth
-                  id="email"
-                  label="Email Address"
-                  name="email"
-                  autoComplete="email"
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  required
                   fullWidth
                   multiline
                   rows={4}
-                  maxRows={6}
                   id="idealNextRole"
                   label="Ideal Next Role(s)"
                   name="idealNextRole"
@@ -207,11 +283,9 @@ export default function SignUp() {
               </Grid>
               <Grid item xs={12}>
                 <TextField
-                  required
                   fullWidth
                   multiline
                   rows={4}
-                  maxRows={6}
                   id="otherNotes"
                   label="Other Notes"
                   name="otherNotes"
@@ -220,14 +294,28 @@ export default function SignUp() {
               </Grid>
               <Grid container justifyContent="flex-start" paddingLeft="16px">
                 <FormControlLabel
-                  control={<Checkbox value="needVisa" color="primary" />}
+                  control={
+                    <Checkbox
+                      color="primary"
+                      id="visaSponsorship"
+                      name="visaSponsorship"
+                      checked={checkedItems["visaSponsorship"] || false}
+                      onChange={handleChange}
+                    />
+                  }
                   label="Need Visa Sponsorship"
                 />
               </Grid>
               <Grid container justifyContent="flex-start" paddingLeft="16px">
                 <FormControlLabel
                   control={
-                    <Checkbox value="allowExtraEmails" color="primary" />
+                    <Checkbox
+                      color="primary"
+                      id="recruitersContact"
+                      name="recruitersContact"
+                      checked={checkedItems["recruitersContact"] || false}
+                      onChange={handleChange}
+                    />
                   }
                   label="I want recruiters to contact me."
                 />
