@@ -13,9 +13,10 @@ import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { FormGroup } from "@mui/material";
 import HowToRegIcon from "@mui/icons-material/HowToReg";
-import S3 from "aws-sdk/clients/s3";
+// import S3 from "aws-sdk/clients/s3";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import axios from "axios";
 
 function Copyright(props) {
   return (
@@ -47,48 +48,50 @@ export default function SignUp() {
     });
   };
 
-  const S3_BUCKET = process.env.REACT_APP_BUCKET_NAME;
-  const REGION = process.env.REACT_APP_REGION_NAME;
-  const ACCESS_KEY = process.env.REACT_APP_ACCESS_KEY;
-  const SECRET_ACCESS_KEY = process.env.REACT_APP_SECRET_KEY;
+  // create JSON file in s3 bucket by uploading JSON object
 
-  const s3 = new S3({
-    accessKeyId: ACCESS_KEY,
-    secretAccessKey: SECRET_ACCESS_KEY,
-    region: REGION,
-    signatureVersion: "v4",
-  });
+  // const S3_BUCKET = process.env.REACT_APP_BUCKET_NAME;
+  // const REGION = process.env.REACT_APP_REGION_NAME;
+  // const ACCESS_KEY = process.env.REACT_APP_ACCESS_KEY;
+  // const SECRET_ACCESS_KEY = process.env.REACT_APP_SECRET_KEY;
 
-  const handleUpload = async (userProfileObj) => {
-    try {
-      toast("Saving your profile...");
-      const res = s3.putObject(
-        {
-          Bucket: S3_BUCKET,
-          Key: `${userProfileObj.firstName}-${userProfileObj.lastName}.json`,
-          Body: JSON.stringify(userProfileObj),
-          ContentType: "application/octet-stream",
-        },
-        function (err, data) {
-          console.log(JSON.stringify(err) + " " + JSON.stringify(data));
-        }
-      );
-      console.log(res);
-    } catch (e) {
-      toast.error("Upload Failed");
-      console.log(e);
-    }
-  };
+  // const s3 = new S3({
+  //   accessKeyId: ACCESS_KEY,
+  //   secretAccessKey: SECRET_ACCESS_KEY,
+  //   region: REGION,
+  //   signatureVersion: "v4",
+  // });
+
+  // const handleUpload = async (userProfileObj) => {
+  //   try {
+  //     toast("Saving your profile...");
+  //     const res = s3.putObject(
+  //       {
+  //         Bucket: S3_BUCKET,
+  //         Key: `${userProfileObj.firstName}-${userProfileObj.lastName}.json`,
+  //         Body: JSON.stringify(userProfileObj),
+  //         ContentType: "application/octet-stream",
+  //       },
+  //       function (err, data) {
+  //         console.log(JSON.stringify(err) + " " + JSON.stringify(data));
+  //       }
+  //     );
+  //     console.log(res);
+  //   } catch (e) {
+  //     toast.error("Upload Failed");
+  //     console.log(e);
+  //   }
+  // };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    console.log(data);
-    console.log(checkedItems);
+    const email = data.get("email");
+    const fileName = email.split("@")[0];
     const userProfileObj = {
       firstName: data.get("firstName"),
       lastName: data.get("lastName"),
-      email: data.get("email"),
+      email: email,
       password: data.get("password"),
       previousTitle: data.get("prevTitle"),
       previousCompany: data.get("prevCompany"),
@@ -104,7 +107,23 @@ export default function SignUp() {
       visaSponsorship: checkedItems.visaSponsorship || false,
       recruitersContact: checkedItems.recruitersContact || false,
     };
-    handleUpload(userProfileObj);
+
+    // make axios post call to send JSON data
+    try {
+      const res = await axios.put(
+        `https://candidate-profiles.naveenjammula.workers.dev?name=${fileName}`,
+        JSON.stringify(userProfileObj),
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      toast("Saving your profile...");
+      console.log(res);
+    } catch (e) {
+      console.log("Error submitting form", e);
+    }
   };
 
   return (
