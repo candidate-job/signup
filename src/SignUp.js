@@ -17,6 +17,7 @@ import HowToRegIcon from "@mui/icons-material/HowToReg";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
+import supabase from "./supabaseClient";
 
 function Copyright(props) {
   return (
@@ -88,42 +89,75 @@ export default function SignUp() {
     const data = new FormData(event.currentTarget);
     const email = data.get("email");
     const fileName = email.split("@")[0];
+    // const userProfileObj = {
+    //   firstName: data.get("firstName"),
+    //   lastName: data.get("lastName"),
+    //   email: email,
+    //   password: data.get("password"),
+    //   previousTitle: data.get("prevTitle"),
+    //   previousCompany: data.get("prevCompany"),
+    //   currentLocation: data.get("currentLocation"),
+    //   remote: checkedItems.remote || false,
+    //   hybrid: checkedItems.hybrid || false,
+    //   inPerson: checkedItems.inPerson || false,
+    //   linkedIn: data.get("linkedIn"),
+    //   github: data.get("github"),
+    //   idealNextRole: data.get("idealNextRole"),
+    //   yeasOfExperience: data.get("yearsOfExperience"),
+    //   otherNotes: data.get("otherNotes"),
+    //   visaSponsorship: checkedItems.visaSponsorship || false,
+    //   recruitersContact: checkedItems.recruitersContact || false,
+    // };
     const userProfileObj = {
-      firstName: data.get("firstName"),
-      lastName: data.get("lastName"),
+      first_name: data.get("firstName"),
+      last_name: data.get("lastName"),
       email: email,
-      password: data.get("password"),
-      previousTitle: data.get("prevTitle"),
-      previousCompany: data.get("prevCompany"),
-      currentLocation: data.get("currentLocation"),
-      remote: checkedItems.remote || false,
-      hybrid: checkedItems.hybrid || false,
-      inPerson: checkedItems.inPerson || false,
+      previous_title: data.get("prevTitle"),
+      previous_company: data.get("prevCompany"),
+      current_location: data.get("currentLocation"),
+      is_remote: checkedItems.remote || false,
+      is_hybrid: checkedItems.hybrid || false,
+      is_inperson: checkedItems.inPerson || false,
       linkedIn: data.get("linkedIn"),
       github: data.get("github"),
-      idealNextRole: data.get("idealNextRole"),
-      yeasOfExperience: data.get("yearsOfExperience"),
-      otherNotes: data.get("otherNotes"),
-      visaSponsorship: checkedItems.visaSponsorship || false,
-      recruitersContact: checkedItems.recruitersContact || false,
+      ideal_next_role: data.get("idealNextRole"),
+      yoe: data.get("yearsOfExperience"),
+      notes: data.get("otherNotes"),
+      is_sponsorship: checkedItems.visaSponsorship || false,
+      is_consent: checkedItems.recruitersContact || false,
     };
 
-    // make axios post call to send JSON data
+    // make a post request to supabase
     try {
-      const res = await axios.put(
-        `https://candidate-profiles.naveenjammula.workers.dev?name=${fileName}`,
-        JSON.stringify(userProfileObj),
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
       toast("Saving your profile...");
-      console.log(res);
-    } catch (e) {
-      console.log("Error submitting form", e);
+      const { data, error } = await supabase
+        .from("candidates")
+        .insert([userProfileObj]);
+      if (error) throw error;
+      console.log(data);
+      toast.success("Profile saved successfully!");
+    } catch (error) {
+      console.log(error);
     }
+
+    // }
+
+    // // make axios post call to send JSON data
+    // try {
+    //   const res = await axios.put(
+    //     `https://candidate-profiles.naveenjammula.workers.dev?name=${fileName}`,
+    //     JSON.stringify(userProfileObj),
+    //     {
+    //       headers: {
+    //         "Content-Type": "application/json",
+    //       },
+    //     }
+    //   );
+    //   toast("Saving your profile...");
+    //   console.log(res);
+    // } catch (e) {
+    //   console.log("Error submitting form", e);
+    // }
   };
 
   return (
@@ -194,7 +228,7 @@ export default function SignUp() {
                   fullWidth
                   id="prevCompany"
                   label="Previous Company"
-                  name="previous company"
+                  name="prevCompany"
                   autoComplete="prev-Company"
                 />
               </Grid>
@@ -203,7 +237,7 @@ export default function SignUp() {
                   fullWidth
                   id="currentLocation"
                   label="Current Location"
-                  name="current location"
+                  name="currentLocation"
                   autoComplete="current-location"
                 />
               </Grid>
