@@ -16,7 +16,6 @@ import HowToRegIcon from "@mui/icons-material/HowToReg";
 // import S3 from "aws-sdk/clients/s3";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import axios from "axios";
 import supabase from "./supabaseClient";
 
 function Copyright(props) {
@@ -88,26 +87,6 @@ export default function SignUp() {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     const email = data.get("email");
-    const fileName = email.split("@")[0];
-    // const userProfileObj = {
-    //   firstName: data.get("firstName"),
-    //   lastName: data.get("lastName"),
-    //   email: email,
-    //   password: data.get("password"),
-    //   previousTitle: data.get("prevTitle"),
-    //   previousCompany: data.get("prevCompany"),
-    //   currentLocation: data.get("currentLocation"),
-    //   remote: checkedItems.remote || false,
-    //   hybrid: checkedItems.hybrid || false,
-    //   inPerson: checkedItems.inPerson || false,
-    //   linkedIn: data.get("linkedIn"),
-    //   github: data.get("github"),
-    //   idealNextRole: data.get("idealNextRole"),
-    //   yeasOfExperience: data.get("yearsOfExperience"),
-    //   otherNotes: data.get("otherNotes"),
-    //   visaSponsorship: checkedItems.visaSponsorship || false,
-    //   recruitersContact: checkedItems.recruitersContact || false,
-    // };
     const userProfileObj = {
       first_name: data.get("firstName"),
       last_name: data.get("lastName"),
@@ -356,7 +335,7 @@ export default function SignUp() {
                       onChange={handleChange}
                     />
                   }
-                  label="Need Visa Sponsorship"
+                  label="Visa Sponsorship"
                 />
               </Grid>
               <Grid container justifyContent="flex-start" paddingLeft="16px">
@@ -370,7 +349,7 @@ export default function SignUp() {
                       onChange={handleChange}
                     />
                   }
-                  label="I want recruiters to contact me."
+                  label="Share profile with recruiters"
                 />
               </Grid>
             </Grid>
