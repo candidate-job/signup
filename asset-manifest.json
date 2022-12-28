@@ -1,15 +1,16 @@
 {
   "files": {
     "main.css": "/signup/static/css/main.448d2caf.css",
-    "main.js": "/signup/static/js/main.a49c120e.js",
+    "main.js": "/signup/static/js/main.f3f1395d.js",
     "static/js/787.8376769c.chunk.js": "/signup/static/js/787.8376769c.chunk.js",
+    "static/media/layoffs.png": "/signup/static/media/layoffs.33ce6ab46dba88728ce9.png",
     "index.html": "/signup/index.html",
     "main.448d2caf.css.map": "/signup/static/css/main.448d2caf.css.map",
-    "main.a49c120e.js.map": "/signup/static/js/main.a49c120e.js.map",
+    "main.f3f1395d.js.map": "/signup/static/js/main.f3f1395d.js.map",
     "787.8376769c.chunk.js.map": "/signup/static/js/787.8376769c.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.448d2caf.css",
-    "static/js/main.a49c120e.js"
+    "static/js/main.f3f1395d.js"
   ]
 }
