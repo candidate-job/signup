@@ -12,8 +12,8 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import HowToRegIcon from "@mui/icons-material/HowToReg";
 // import S3 from "aws-sdk/clients/s3";
 import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import supabase from "./supabaseClient";
+import "react-toastify/dist/ReactToastify.css";
 
 function Copyright(props) {
   return (
@@ -52,7 +52,7 @@ export default function Admin() {
     try {
       toast("Saving your profile...");
       const { data, error } = await supabase
-        .from("candidates")
+        .from("recruiters")
         .insert([userProfileObj]);
       if (error) throw error;
       console.log(data);

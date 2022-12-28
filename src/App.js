@@ -13,6 +13,7 @@ import { useState } from "react";
 import Admin from "./Admin";
 import "./App.css";
 import SignUp from "./SignUp";
+import layoffsLogo from "./layoffs.png";
 
 function App() {
   const [isRecruiter, setIsRecruiter] = useState(false);
@@ -28,19 +29,30 @@ function App() {
     : " To subscribe to the candidates list, please enter your email address here. We will send updates occasionally.";
   return (
     <div className="App">
-      <Grid container style={{ marginTop: "10em" }}>
+      <img
+        src={layoffsLogo}
+        alt="Layoffs"
+        style={{
+          position: "absolute",
+          width: "50em",
+          height: "19em",
+          marginTop: "-22em",
+          marginLeft: "-22em",
+        }}
+      ></img>
+      <Grid container style={{ marginTop: "22em" }}>
         <Grid item xs={12}>
-          <Typography variant="h4">
+          <Typography variant="h4" fontFamily="Roboto">
             Layoff is difficult. We can help!
           </Typography>
         </Grid>
         <Grid item xs={12}>
-          <Typography variant="h5" fontStyle={"italic"}>
+          <Typography variant="h5" fontStyle={"italic"} fontFamily="Roboto">
             candidate: we will share with all recruiters
           </Typography>
         </Grid>
         <Grid item xs={12}>
-          <Typography variant="h5" fontStyle={"italic"}>
+          <Typography variant="h5" fontStyle={"italic"} fontFamily="Roboto">
             recruiter: sign up to view & receive awesome candidates
           </Typography>
         </Grid>
@@ -55,7 +67,12 @@ function App() {
           <Grid item xs={2}>
             <Box
               component="span"
-              sx={{ p: 5, border: "1px dashed grey", maxWidth: "2em" }}
+              sx={{
+                p: 5,
+                border: "1px dashed grey",
+                maxWidth: "2em",
+                backgroundColor: "lightgrey",
+              }}
             >
               <Button
                 style={{ fontStyle: "italic" }}
@@ -68,7 +85,12 @@ function App() {
           <Grid item xs={2}>
             <Box
               component="span"
-              sx={{ p: 5, border: "1px dashed grey", maxWidth: "2em" }}
+              sx={{
+                p: 5,
+                border: "1px dashed grey",
+                maxWidth: "2em",
+                backgroundColor: "lightgrey",
+              }}
             >
               <Button
                 style={{ fontStyle: "italic" }}
